@@ -1,0 +1,118 @@
+---
+title: "630HotelOpt"
+author: "Marlene Aviles"
+date: "5/8/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+library(GGally)
+library(caret)
+```
+
+## Optimal hotel recommendations for Expedia’s users 
+
+The following analysis will look at data from Expedia's users to recommend an 
+optima hotel recommendation.
+
+### Expedia: Test Dataset 
+```{r, echo=FALSE, warning=FALSE}
+test <- read_csv("~/Desktop/630:640/630 Predictive Analytics/Hotel Optimization Recommendation/test.csv")
+#summary(test)
+```
+
+### Expedia: Train Dataset
+```{r, echo=FALSE, warning=FALSE}
+train <- read_csv("~/Desktop/630:640/630 Predictive Analytics/Hotel Optimization Recommendation/train.csv")
+#summary(train)
+```
+
+### Visuals
+
+```{r, echo=FALSE}
+#hist(train$hotel_cluster, train$is_booking)
+
+histogram <- ggplot(train,aes(hotel_cluster)) + geom_histogram(aes(is_booking),stat="count")
+histogram + labs(title="Hotel Histogram",y="Booking", x="Hotel Cluster")
+```
+
+### Model Creation: Training & Test Sets 
+
+```{r}
+
+inTrain = createDataPartition(y = train$hotel_cluster, # predicting variables 
+                              p = 0.7, # proportion of values in training set
+                              list = FALSE) # returns vector of indices
+ 
+#Create training and test sets
+TrainingSet = data[inTrain, ]
+TestSet     = data[-inTrain, ]
+
+```
+
+### Training Model
+
+### Linear Regression
+```{r, echo=FALSE}
+mod1 = train(y ~ ., 
+            data = TrainingSet, 
+            method = "glm", 
+            family = "binomial")
+
+# Predictions
+ptest  = predict(mod, newdata = TestSet)
+ptrain = predict(mod, newdata = TrainingSet)
+ 
+# Accuracy
+ 
+# Acc: training set
+mean(ptrain == TrainingSet$y)
+ 
+#Acc: Test set
+mean(ptest == TestSet$y)
+```
+
+
+### Predictions & Accuracy
+```{r}
+# Predictions
+ptest  = predict(mod, newdata = TestSet)
+ptrain = predict(mod, newdata = TrainingSet)
+ 
+# Accuracy
+ 
+# Acc: training set
+mean(ptrain == TrainingSet$y)
+ 
+#Acc: Test set
+mean(ptest == TestSet$y)
+```
+
+
+### Regression Tree
+```{r, echo=FALSE}
+mod1 = train(y ~ ., 
+            data = TrainingSet, 
+            method = "rpart", 
+            family = "binomial")
+
+# Predictions
+ptest1  = predict(mod1, newdata = TestSet)
+ptrain1 = predict(mod1, newdata = TrainingSet)
+ 
+# Accuracy
+ 
+# Acc: training set
+mean(ptrain1 == TrainingSet$y)
+ 
+#Acc: Test set
+mean(ptest1 == TestSet$y)
+```
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
